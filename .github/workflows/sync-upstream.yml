@@ -19,4 +19,9 @@ jobs:
       - name: Sync fork with upstream
         run: gh api --method POST /repos/${{ github.repository }}/merge-upstream -f branch='main'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKEN cannot sync commits that touch .github/workflows/.
+          # A fine-grained PAT (Contents: write + Workflows: write on the fork)
+          # stored as SYNC_PAT removes that limitation; without it the job
+          # falls back to GITHUB_TOKEN and workflow-touching syncs fail
+          # visibly — recover via the "Sync fork" button in the fork UI.
+          GH_TOKEN: ${{ secrets.SYNC_PAT || secrets.GITHUB_TOKEN }}
