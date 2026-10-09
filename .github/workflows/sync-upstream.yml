@@ -1,0 +1,22 @@
+name: Sync Fork with Upstream
+
+# Runs only inside the lab22-sit fork — a no-op on the canonical repository.
+# Note: scheduled workflows are disabled by default on forks; enable them
+# once from the fork's Actions tab.
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    if: github.repository == 'lab22-sit/koi-maestro'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Sync fork with upstream
+        run: gh api --method POST /repos/${{ github.repository }}/merge-upstream -f branch='main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
